@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Diwali Gift of Love</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Dancing+Script:wght@700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            /* CHANGE: Soft Pink/Gold Luminous Background */
+            background: linear-gradient(135deg, #ffd1dc 0%, #ffebcd 100%); /* Light Pink to Cream/Gold */
+            overflow-x: hidden;
+            position: relative;
+            color: #333; /* Default text slightly darker for contrast */
+        }
+
+        /* --- Custom CSS for Diwali and Love Effects --- */
+        
+        @keyframes bounce-diya {
+            0%, 100% { transform: translateY(0) rotate(var(--initial-rotate, 0deg)) scale(1); }
+            50% { transform: translateY(-5px) rotate(var(--initial-rotate, 0deg)) scale(1.1); }
+        }
+
+        /* Diya Icon Styling (Inline SVG) */
+        .diya {
+            --initial-rotate: 0deg;
+            color: #ff9900; /* Warm Gold */
+            filter: drop-shadow(0 0 5px #ffcc00) drop-shadow(0 0 10px rgba(255, 153, 0, 0.8));
+            transition: transform 0.5s ease;
+        }
+        .diya-left { --initial-rotate: -12deg; transform: rotate(-12deg); }
+        .diya-right { --initial-rotate: 12deg; transform: rotate(12deg); }
+        .diya:hover { transform: scale(1.1) rotate(var(--initial-rotate)); }
+        .diya.bounce {
+            animation: bounce-diya 0.5s ease-out 3; /* Bounce 3 times */
+        }
+
+        /* Animation Container for all floating elements */
+        .animation-container {
+            pointer-events: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 5; /* Below the main card */
+        }
+        
+        /* Passive Heart Animation */
+        @keyframes fall {
+            0% { transform: translateY(0) scale(0.5); opacity: 0; }
+            10% { opacity: 1; }
+            80% { opacity: 0.8; }
+            100% { transform: translateY(-100vh) scale(1.5); opacity: 0; }
+        }
+        .heart {
+            position: absolute; font-size: 24px; color: #ff69b4; opacity: 0; animation: fall linear infinite;
+        }
+        
+        /* Interactive Heart Pop Animation */
+        @keyframes heartPop {
+            0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
+            100% { transform: translate(var(--x-rand), var(--y-rand)) scale(1.5); opacity: 0; }
+        }
+        .pop-heart {
+            position: absolute; color: #ff69b4; font-size: 20px; pointer-events: none; z-index: 100; animation: heartPop 0.8s ease-out forwards;
+        }
+
+        /* Fireworks animation */
+        @keyframes firework {
+            0% { transform: scale(0.1); opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        .firework {
+            position: absolute; width: 5px; height: 5px; border-radius: 50%; background: #fff;
+            box-shadow: 0 0 20px 5px #ffcc00, 0 0 50px 10px #ff00ff; /* Yellow/Pink glow */
+            animation: firework 2s ease-out infinite;
+        }
+
+        /* Twinkling Star Animation */
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+        .star {
+            position: absolute; color: #fff; font-size: 10px; opacity: 0;
+            filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.7));
+            animation: twinkle linear infinite;
+        }
+
+        /* Style for the main card/message box */
+        .gift-card {
+            background: rgba(255, 255, 255, 0.4); /* Slightly more transparent glass */
+            backdrop-filter: blur(15px); /* More blur for better glass effect */
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.8); /* Sharper white border */
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); /* Slightly stronger shadow */
+            color: #1f012e;
+            z-index: 10;
+            position: relative;
+            padding: 2rem; /* Reduced padding for smaller look */
+        }
+        
+        /* Adjusting colors for the new light theme */
+        .gift-card h1, .gift-card p { color: #333; }
+        .gift-card h1 { color: #d1700d; }
+
+        /* --- GIFT BOX STYLING (NEW) --- */
+        #gift-section {
+            position: relative;
+            /* Inner Glassy Layer */
+            background-color: rgba(255, 255, 255, 0.1); /* Inner glass layer */
+            backdrop-filter: blur(5px);
+            /* Outer Box Color (using a wrapper to get solid look) */
+            padding: 1.5rem; /* Inner padding */
+            background-clip: padding-box;
+            background-origin: padding-box;
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            /* CHOTA BOX: Removed w-full/max-w and relied on padding */
+        }
+        
+        /* Gift Wrap Effect (Applied via an absolutely positioned pseudo-element for solid color) */
+        #gift-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #c2185b; /* Deep Pink Gift Box */
+            z-index: 1;
+            border-radius: 0.75rem; /* Match parent rounded-xl */
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3); /* Subtle internal shadow */
+            transition: opacity 0.5s ease, transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        /* Ribbon Styling (Targets the box itself) */
+        #gift-section:after, #gift-section > .ribbon-vertical {
+            content: '';
+            position: absolute;
+            background: linear-gradient(to bottom, #ffd700, #ffcc33); /* Gold gradient */
+            box-shadow: 0 0 5px rgba(255, 215, 0, 0.8);
+            pointer-events: none;
+            z-index: 2; /* Above the wrap, below content */
+            transition: opacity 0.5s ease;
+        }
+        /* Vertical Ribbon (using a div for better control) */
+        #gift-section > .ribbon-vertical {
+            width: 25px;
+            height: 100%;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        /* Horizontal Ribbon (using :after) */
+        #gift-section:after {
+            width: 100%;
+            height: 25px;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+        }
+
+        /* Content inside the gift box */
+        #gift-closed-content, #gift-content {
+            position: relative;
+            z-index: 3;
+            color: white; 
+        }
+
+        /* --- GIFT OPENING STATES --- */
+        
+        /* Hide ribbons and wrap on open */
+        .gift-opened::before,
+        .gift-opened::after, 
+        .gift-opened > .ribbon-vertical {
+            opacity: 0 !important;
+        }
+
+        /* Main box state when opening */
+        .gift-opening {
+            transform: scale(1.05) rotateY(10deg) !important; /* Lighter visual opening effect */
+        }
+        
+        .gift-opened {
+            background-color: rgba(255, 255, 255, 0.1) !important; /* Final state: only inner glass remains */
+            border: none !important;
+            box-shadow: none !important;
+            transform: none !important;
+            transition: all 0.5s ease !important;
+        }
+        
+        .gift-opened #gift-content {
+            opacity: 1; /* Reveal message */
+            color: #333; /* Message text back to dark for contrast on light glass */
+        }
+        
+        /* Styling for the button */
+        #redeem-button {
+             background-color: #ffebcd; /* Cream/Gold button */
+             color: #c2185b; /* Deep pink text */
+             font-size: 1.25rem;
+             box-shadow: 0 4px 15px rgba(255, 235, 205, 0.7);
+        }
+        #redeem-button:hover:not(:disabled) { background-color: #ffd700; }
+        #redeem-button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* Content visible AFTER opening adjustments */
+        .gift-opened #gift-content h2 { color: #d1700d; } /* Orange/Gold title */
+        
+        /* Custom font for the main message content */
+        .romantic-script {
+            font-family: 'Dancing Script', cursive;
+            font-weight: 700;
+        }
+
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <!-- Animation Containers -->
+    <div id="heart-container" class="animation-container"></div>
+    <div id="fireworks-container" class="animation-container"></div>
+    <div id="star-container" class="animation-container"></div>
+    <div id="interaction-container" class="absolute inset-0 z-50 pointer-events-none"></div>
+
+    <!-- Main Content Card (Glass Card) -->
+    <div id="gift-card" class="gift-card w-full max-w-xl p-4 md:p-8 rounded-3xl text-center z-20">
+        
+        <!-- Header -->
+        <div class="flex justify-center space-x-8 mb-6">
+            <svg class="diya diya-left w-10 h-10" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C9.243 2 7 4.243 7 7v1H4a1 1 0 0 0 0 2h16a1 1 0 0 0 0-2h-3V7c0-2.757-2.243-5-5-5zM9 8h6V7c0-1.654-1.346-3-3-3s-3 1.346-3 3v1zm10 4H5c-1.103 0-2 .897-2 2v7h18v-7c0-1.103-.897-2-2-2zM5 14h14l-1.07 1.07-1.48 1.48-1.5 1.5-1.53 1.53-1.47 1.47-1.47-1.47-1.53-1.53-1.5-1.5-1.48-1.48L5 14z"/>
+            </svg>
+            <svg class="diya diya-right w-10 h-10" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C9.243 2 7 4.243 7 7v1H4a1 1 0 0 0 0 2h16a1 1 0 0 0 0-2h-3V7c0-2.757-2.243-5-5-5zM9 8h6V7c0-1.654-1.346-3-3-3s-3 1.346-3 3v1zm10 4H5c-1.103 0-2 .897-2 2v7h18v-7c0-1.103-.897-2-2-2zM5 14h14l-1.07 1.07-1.48 1.48-1.5 1.5-1.53 1.53-1.47 1.47-1.47-1.47-1.53-1.53-1.5-1.5-1.48-1.48L5 14z"/>
+            </svg>
+        </div>
+
+        <h1 class="text-5xl font-extrabold mb-2" style="font-family: 'Dancing Script', cursive;">
+            Happy Diwali, My Love!
+        </h1>
+        <p class="text-xl mb-6 font-light">
+            From My Heart to Yours ❤️
+        </p>
+        
+        <!-- Gift Box Area (INITIAL STATE) -->
+        <div id="gift-section" class="p-6 rounded-xl border border-pink-400 border-dashed transform hover:scale-[1.02] transition-transform duration-300 mx-auto max-w-sm md:max-w-md">
+            
+            <!-- Gold Vertical Ribbon (as a separate div for stacking context) -->
+            <div class="ribbon-vertical"></div>
+
+            <!-- Content visible BEFORE opening -->
+            <div id="gift-closed-content">
+                <h2 class="text-2xl font-bold mb-6 text-white leading-relaxed">
+                    Ye chhota sa gift mere dil ka ek hissa hai… jise maine sirf aapke liye sambhal ke rakha tha 💫
+                </h2>
+                
+                <button id="redeem-button" class="inline-block px-10 py-4 mt-2 text-2xl font-bold rounded-full shadow-xl transition duration-300 transform hover:scale-105">
+                    Open Gift 🎁
+                </button>
+            </div>
+
+            <!-- Content visible AFTER opening (Hidden initially) -->
+            <div id="gift-content" class="text-center">
+                <!-- Message Title -->
+                <h2 class="text-3xl font-bold mb-4">
+                    ✨💛 Happy Diwali My Aarya 💛✨
+                </h2>
+                <div class="text-left text-base leading-relaxed space-y-3 px-2 md:px-4">
+                    <p class="mb-2">
+                        Aapko Diwali ki bhtt bhtt shubhkamnayein 🪔. Har saal Diwali aati hai, par is saal kuch alag hai... kyunki is baar meri zindagi mein aap ho ✨
+                    </p>
+                    <p>
+                        Aap mere liye sirf ek naam nahi, ek emotion ban chuke ho — wo feeling jo dil ko sukoon deti hai, aur har din thoda aur beautiful bana deti hai ❤️
+                    </p>
+                    <p>
+                        Kabhi socha nahi tha ki koi itna close hojayega ki har chhoti si baat bhi share karne ka mann kare... par aapke saath toh har moment special lagta hai, chahe vo ek chhoti si smile ho ya ek caring baat 💫
+                    </p>
+                    <p>
+                        Aap meri life ka wo **light** ho jo andhere dinon mein bhi shine karti hai 🌙 Jab sab kuch dull lagta hai, tab aapki ek message ya ek baat literally pura mood change kar deti hai 🧡
+                    </p>
+                    <p>
+                        Iss Diwali bas yehi wish hai ki aapke life mein hamesha khushiyaan, peace aur success rahe — aur mai hamesha aapke saath rahun, har khushi aur har moment mein 💞
+                    </p>
+                    <p class="text-xl mt-4 romantic-script text-pink-600">
+                        Aap meri Diwali ki sabse pyari roshni ho Aarya...
+                    </p>
+                    <p>
+                        Jab sab jagah diye jalte hain, mujhe sirf ek light sabse khoobsurat lagti hai — aapke presence ki 🌸
+                    </p>
+                    <p>
+                        Bas aise hi haste rahiye, khush rahiye, aur mujhe apne life ka hissa banaye rakhiye... Because honestly, aap meri life ka best part ho 💫
+                    </p>
+                </div>
+
+                <!-- Final Signature -->
+                <div class="mt-6 pt-4 border-t border-gray-300">
+                    <p class="text-xl romantic-script text-pink-600">
+                        Happy Diwali once again, meri Aarya 💖
+                    </p>
+                    <p class="text-base mt-2 font-semibold">
+                        May this Diwali bring endless smiles, pyar, aur wo chhoti chhoti moments jo sirf hum dono samjhte hain 💕
+                    </p>
+                    <p class="text-sm italic mt-3">
+                        🕯️✨ Love you infinitely, from the bottom of my heart 💛
+                    </p>
+                    <p class="text-lg font-bold mt-1 text-gray-800">
+                        – Yours, Shubh 🖤
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Signature -->
+        <p class="mt-8 text-sm italic">
+            With infinite love and sparkle, from your biggest admirer.
+        </p>
+
+    </div>
+
+    <script>
+        // --- Animation Logic ---
+
+        const interactionContainer = document.getElementById('interaction-container');
+        const giftSection = document.getElementById('gift-section');
+        const redeemButton = document.getElementById('redeem-button');
+        const giftClosedContent = document.getElementById('gift-closed-content');
+        const giftOpenedContent = document.getElementById('gift-content');
+        const diyaLeft = document.querySelector('.diya-left');
+        const diyaRight = document.querySelector('.diya-right');
+
+
+        // Hide opened content initially
+        giftOpenedContent.style.opacity = '0'; 
+
+        // Function to create and animate a heart pop on click
+        function createPopHeart(x, y) {
+            const heart = document.createElement('div');
+            heart.classList.add('pop-heart');
+            heart.textContent = '💖'; 
+
+            heart.style.left = `${x}px`;
+            heart.style.top = `${y}px`;
+
+            const randomX = Math.random() * 40 - 20; 
+            const randomY = -(Math.random() * 30 + 30); 
+            
+            heart.style.setProperty('--x-rand', `${randomX}px`);
+            heart.style.setProperty('--y-rand', `${randomY}px`);
+
+            interactionContainer.appendChild(heart);
+            setTimeout(() => { heart.remove(); }, 800);
+        }
+
+        // --- GIFT OPENING HANDLER ---
+        redeemButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Do nothing if already opened
+            if (giftSection.classList.contains('gift-opened')) return;
+
+            // 1. Disable button and start opening animation
+            redeemButton.disabled = true;
+            giftSection.classList.add('gift-opening');
+
+            // 2. Trigger Burst Animation from button location
+            const rect = redeemButton.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            // Heart burst (more intense)
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => { 
+                    const angle = i * (360 / 20) * (Math.PI / 180);
+                    const offset = 40 + (Math.random() * 20);
+                    const finalX = centerX + offset * Math.cos(angle);
+                    const finalY = centerY + offset * Math.sin(angle);
+                    
+                    createPopHeart(finalX, finalY); 
+                }, i * 20); 
+            }
+            // Firework burst (manual trigger)
+            for (let i = 0; i < 7; i++) {
+                setTimeout(() => { createFireworkAt(centerX, centerY); }, i * 100);
+            }
+
+            // 3. Complete the opening sequence and reveal content
+            setTimeout(() => {
+                giftSection.classList.remove('gift-opening');
+                giftSection.classList.add('gift-opened'); 
+                
+                // Hide closed content (button and initial text)
+                giftClosedContent.style.display = 'none';
+                
+                // Reveal the actual gift message
+                giftOpenedContent.style.opacity = '1';
+
+                // Diya bounce effect
+                diyaLeft.classList.add('bounce');
+                diyaRight.classList.add('bounce');
+                setTimeout(() => {
+                    diyaLeft.classList.remove('bounce');
+                    diyaRight.classList.remove('bounce');
+                }, 1500);
+
+                
+                // Show message box feedback
+                // CHANGE MADE HERE: Updated the pop-up message text
+                const message = "For the One Who Makes My Days Better 🌸";
+                const messageBox = document.createElement('div');
+                messageBox.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 20px; background: rgba(0, 0, 0, 0.8); color: white; border-radius: 12px; z-index: 1000; font-family: Poppins, sans-serif; box-shadow: 0 4px 15px rgba(0,0,0,0.5);';
+                messageBox.textContent = message;
+                document.body.appendChild(messageBox);
+                setTimeout(() => messageBox.remove(), 4000);
+
+            }, 800); // Wait for the transition duration
+        });
+
+        // Event Listener for the Gift Card (general interaction)
+        document.getElementById('gift-card').addEventListener('click', (e) => {
+             // Only pop a heart if it's not the button click and the gift is not open
+            if (e.target.id !== 'redeem-button' && !giftSection.classList.contains('gift-opened')) {
+                 createPopHeart(e.clientX, e.clientY);
+            }
+        });
+
+
+        // 1. Falling Hearts Animation (Love Theme - passive)
+        const heartContainer = document.getElementById('heart-container');
+        const colors = ['#ff69b4', '#ff85a1', '#ffc2d1', '#f06292']; 
+        function createHeart() {
+            const heart = document.createElement('div'); heart.classList.add('heart'); heart.textContent = '💖'; 
+            heart.style.left = `${Math.random() * 100}vw`; heart.style.animationDuration = `${Math.random() * 5 + 5}s`;
+            heart.style.fontSize = `${Math.random() * 20 + 10}px`; 
+            heart.style.transform = `translateY(100vh) rotate(${Math.random() * 360}deg)`;
+            heart.style.color = colors[Math.floor(Math.random() * colors.length)];
+            heartContainer.appendChild(heart);
+            heart.addEventListener('animationend', () => { heart.remove(); });
+        }
+        setInterval(createHeart, 300);
+
+
+        // 2. Fireworks Animation (Diwali Theme)
+        const fireworksContainer = document.getElementById('fireworks-container');
+        function createFirework() {
+            const firework = document.createElement('div'); firework.classList.add('firework');
+            firework.style.left = `${Math.random() * 100}vw`; firework.style.top = `${Math.random() * 60}vh`;
+            firework.style.animationDuration = `${Math.random() * 1.5 + 1.5}s`;
+            fireworksContainer.appendChild(firework);
+            firework.addEventListener('animationend', () => { firework.remove(); });
+        }
+        // Manual firework trigger (used for button click)
+        function createFireworkAt(x, y) {
+            const firework = document.createElement('div'); firework.classList.add('firework');
+            firework.style.left = `${x}px`; firework.style.top = `${y}px`;
+            firework.style.animationDuration = '1.2s'; // Faster burst
+            firework.style.fontSize = '8px'; // Bigger visual effect
+            fireworksContainer.appendChild(firework);
+            firework.addEventListener('animationend', () => { firework.remove(); });
+        }
+        setInterval(createFirework, 800);
+        
+        // 3. Twinkling Stars Animation
+        const starContainer = document.getElementById('star-container');
+        function createStar() {
+            const star = document.createElement('div'); star.classList.add('star'); star.textContent = '★';
+            star.style.left = `${Math.random() * 100}vw`; star.style.top = `${Math.random() * 100}vh`;
+            star.style.animationDuration = `${Math.random() * 2 + 1}s`;
+            star.style.animationDelay = `${Math.random() * 3}s`;
+            starContainer.appendChild(star);
+        }
+        function generateStarField() {
+            const maxStars = 80;
+            if (starContainer.children.length < maxStars) { createStar(); }
+        }
+        setInterval(generateStarField, 200);
+
+    </script>
+</body>
+</html>
